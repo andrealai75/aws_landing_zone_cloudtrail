@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+
+vars:
+  aws_management_account_id:
+    sh: aws sts get-caller-identity --query "Account" --output text
+  aws_region:
+    sh: aws configure get region
+  repository_name:
+    sh: basename -s .git `git config --get remote.origin.url`
+  security_log_account_id:
+    sh: aws organizations list-accounts --query "Accounts[?Name=='log-archive'].Id" --output text
+  security_tooling_account_id:
+    sh: aws organizations list-accounts --query "Accounts[?Name=='security-tooling'].Id" --output text
+
+tasks:
+  variables:
+    desc: Display the current variables
+    cmds:
+      - 'echo "AWS Management Account ID: {{.aws_management_account_id}}"'
+      - 'echo "aws_region: {{.aws_region}}"'
+      - 'echo "repository_name: {{.repository_name}}"'
+    silent: true
+
+  validate:
+    desc: Validate the Terraform configuration
+    cmds:
+      - cd infrastructure && terraform fmt -check -recursive -diff
+    silent: true
+
+  init:
+    desc: Perform initialization tasks
+    cmds:
+      - |
+       cd infrastructure && terraform init \
+         -backend-config="bucket={{.aws_management_account_id}}-{{.aws_region}}-terraform-state" \
+         -backend-config="key={{.repository_name}}" \
+         -backend-config="region={{.aws_region}}"
+    silent: true
+
+  plan:
+    desc: Generate and show an execution plan
+    deps:
+      - init
+    cmds:
+      - |
+        cd infrastructure && terraform plan \
+          -var="aws_region={{.aws_region}}" \
+          -var="security_log_account_id={{.security_log_account_id}}" \
+          -var="security_tooling_account_id={{.security_tooling_account_id}}"
+    silent: true
+
+  apply:
+    desc: Apply the changes required to reach the desired state of the configuration
+    deps:
+      - init
+    cmds:
+       - |
+        cd infrastructure && terraform apply \
+          -var="aws_region={{.aws_region}}" \
+          -var="security_log_account_id={{.security_log_account_id}}" \
+          -var="security_tooling_account_id={{.security_tooling_account_id}}"
+    silent: true
+
+  destroy:
+    desc: Destroy the Terraform-managed infrastructure
+    deps:
+      - init
+    cmds:
+      - |
+        cd infrastructure && terraform plan -destroy \
+          -var="aws_region={{.aws_region}}" \
+          -var="security_log_account_id={{.security_log_account_id}}" \
+          -var="security_tooling_account_id={{.security_tooling_account_id}}"
+      - |    
+        cd infrastructure && terraform apply -destroy \
+          -var="aws_region={{.aws_region}}" \
+          -var="security_log_account_id={{.security_log_account_id}}" \
+          -var="security_tooling_account_id={{.security_tooling_account_id}}"
+    silent: true
