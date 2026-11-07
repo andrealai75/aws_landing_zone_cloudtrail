@@ -23,7 +23,7 @@ provider "aws" {
 
 provider "aws" {
   alias  = "security_tooling"
-  region = "eu-west-2"
+  region = var.aws_region
 
   assume_role {
     role_arn     = "arn:aws:iam::${var.security_tooling_account_id}:role/OrganizationAccountAccessRole"
