@@ -46,6 +46,7 @@ tasks:
       - |
         cd infrastructure && terraform plan \
           -var="aws_region={{.aws_region}}" \
+          -var="aws_management_account_id={{.aws_management_account_id}}" \
           -var="security_log_account_id={{.security_log_account_id}}" \
           -var="security_tooling_account_id={{.security_tooling_account_id}}"
     silent: true
@@ -58,6 +59,7 @@ tasks:
        - |
         cd infrastructure && terraform apply \
           -var="aws_region={{.aws_region}}" \
+          -var="aws_management_account_id={{.aws_management_account_id}}" \
           -var="security_log_account_id={{.security_log_account_id}}" \
           -var="security_tooling_account_id={{.security_tooling_account_id}}"
     silent: true
@@ -70,11 +72,13 @@ tasks:
       - |
         cd infrastructure && terraform plan -destroy \
           -var="aws_region={{.aws_region}}" \
+          -var="aws_management_account_id={{.aws_management_account_id}}" \
           -var="security_log_account_id={{.security_log_account_id}}" \
           -var="security_tooling_account_id={{.security_tooling_account_id}}"
       - |    
         cd infrastructure && terraform apply -destroy \
           -var="aws_region={{.aws_region}}" \
+          -var="aws_management_account_id={{.aws_management_account_id}}" \
           -var="security_log_account_id={{.security_log_account_id}}" \
           -var="security_tooling_account_id={{.security_tooling_account_id}}"
     silent: true

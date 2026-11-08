@@ -12,6 +12,11 @@ terraform {
 }
 
 provider "aws" {
+  alias  = "management_root"
+  region = var.aws_region
+}
+
+provider "aws" {
   alias  = "security_log"
   region = var.aws_region
   

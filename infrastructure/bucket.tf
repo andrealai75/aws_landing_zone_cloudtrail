@@ -55,22 +55,27 @@ resource "aws_s3_bucket_policy" "main" {
           Service = "cloudtrail.amazonaws.com"
         }
         Action    = "s3:GetBucketAcl"
-        Resource = aws_s3_bucket.main.arn
+        Resource  = aws_s3_bucket.main.arn
       },
       {
-        Sid       = "AWSCloudTrailWrite"
+        Sid       = "AWSCloudTrailWriteOrganization"
         Effect    = "Allow"
         Principal = {
           Service = "cloudtrail.amazonaws.com"
         }
         Action    = "s3:PutObject"
-        Resource  = "${aws_s3_bucket.main.arn}/AWSLogs/*"
+        Resource = [
+          "${aws_s3_bucket.main.arn}/AWSLogs/${var.aws_management_account_id}/*",
+          "${aws_s3_bucket.main.arn}/AWSLogs/${data.aws_organizations_organization.current.id}/*"
+        ]
         Condition = {
           StringEquals = {
-            "aws:PrincipalOrgID" = data.aws_organizations_organization.current.id
+            "aws:SourceArn" = "arn:aws:cloudtrail:eu-west-2:${var.aws_management_account_id}:trail/organization-security-trail"
+            "s3:x-amz-acl"  = "bucket-owner-full-control"
           }
         }
       }
     ]
   })
 }
+

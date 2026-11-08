@@ -2,6 +2,10 @@ variable "aws_region" {
   type = string
 }
 
+variable "aws_management_account_id" {
+  type = string
+}
+
 variable "security_log_account_id" {
   type = string
 }
