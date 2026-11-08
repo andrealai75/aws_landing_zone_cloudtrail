@@ -16,7 +16,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "main" {
     bucket_key_enabled = true
 
     apply_server_side_encryption_by_default {
-      sse_algorithm     = "AES256"
+      sse_algorithm = "AES256"
     }
   }
 }
@@ -49,21 +49,21 @@ resource "aws_s3_bucket_policy" "main" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid       = "AWSCloudTrailAclCheck"
-        Effect    = "Allow"
+        Sid    = "AWSCloudTrailAclCheck"
+        Effect = "Allow"
         Principal = {
           Service = "cloudtrail.amazonaws.com"
         }
-        Action    = "s3:GetBucketAcl"
-        Resource  = aws_s3_bucket.main.arn
+        Action   = "s3:GetBucketAcl"
+        Resource = aws_s3_bucket.main.arn
       },
       {
-        Sid       = "AWSCloudTrailWriteOrganization"
-        Effect    = "Allow"
+        Sid    = "AWSCloudTrailWriteOrganization"
+        Effect = "Allow"
         Principal = {
           Service = "cloudtrail.amazonaws.com"
         }
-        Action    = "s3:PutObject"
+        Action = "s3:PutObject"
         Resource = [
           "${aws_s3_bucket.main.arn}/AWSLogs/${var.aws_management_account_id}/*",
           "${aws_s3_bucket.main.arn}/AWSLogs/${data.aws_organizations_organization.current.id}/*"

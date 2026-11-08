@@ -19,7 +19,7 @@ provider "aws" {
 provider "aws" {
   alias  = "security_log"
   region = var.aws_region
-  
+
   assume_role {
     role_arn     = "arn:aws:iam::${var.security_log_account_id}:role/OrganizationAccountAccessRole"
     session_name = "Terraform-SecurityLog-Session"
